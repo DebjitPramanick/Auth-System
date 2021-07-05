@@ -1,5 +1,6 @@
 const graphql = require('graphql')
 const { UserType, AuthType } = require("./Types.js")
+const User = require("../models/User.js")
 
 const { GraphQLID,
     GraphQLInt,
