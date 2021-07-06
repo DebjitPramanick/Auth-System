@@ -3,9 +3,11 @@ const { UserType, AuthType } = require("./Types.js")
 const User = require("../models/User.js")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const isAuth = require('../middleware/isAuth.js')
 
-const { GraphQLString,
-    GraphQLList,
+const { GraphQLID,
+    GraphQLString,
+    GraphQLInt,
     GraphQLNonNull,
     GraphQLObjectType
 } = graphql
@@ -45,6 +47,22 @@ const Query = new GraphQLObjectType({
                             refreshtokenExp: '7d',
                         }
                     }
+                }
+            }
+        },
+
+        getUser: {
+            type: UserType,
+            args: {
+                id: {type: GraphQLID}
+            },
+            async resolve(parent, args, req){
+                if(!req.isAuth){
+                    throw new Error("Unauthenticated user!")
+                }
+                else{
+                    let user = await User.findById(args.id)
+                    return user
                 }
             }
         }
