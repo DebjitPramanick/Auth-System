@@ -3,12 +3,12 @@ const cors = require('cors')
 const {graphqlHTTP} = require('express-graphql')
 const mongoose = require('mongoose')
 const schema = require("./schema/Schema.js")
+const isAuth = require('./middleware/isAuth.js')
 
 const app = express()
 app.use(cors())
 app.use(express.json())
-
-//Q8PS2rR2UhCHUpW
+app.use(isAuth)
 
 const mongoURL = 'mongodb+srv://admin-debjit:Q8PS2rR2UhCHUpW@cluster0.u0mvg.mongodb.net/userDB?retryWrites=true&w=majority'
 mongoose.connect(mongoURL, {

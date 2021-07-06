@@ -4,9 +4,7 @@ const User = require("../models/User.js")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
-const { GraphQLID,
-    GraphQLInt,
-    GraphQLString,
+const { GraphQLString,
     GraphQLList,
     GraphQLNonNull,
     GraphQLObjectType
