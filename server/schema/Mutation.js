@@ -1,5 +1,6 @@
 const graphql = require('graphql')
 const { UserType, AuthType } = require("./Types.js")
+const bcrypt = require('bcryptjs')
 const User = require("../models/User.js")
 
 const { GraphQLID,
@@ -20,8 +21,23 @@ const Mutation = new GraphQLObjectType({
                 password: { type: new GraphQLNonNull(GraphQLString) },
                 age: { type: GraphQLInt }
             },
-            resolve(parent, args){
-                
+            async resolve(parent, args) {
+                let query = await User.findOne({ email: args.email })
+                if (query) {
+                    throw new Error('User already exists.')
+                }
+                else {
+                    let uname = args.email.split('@')[0]
+                    let passHash = await bcrypt.hash(args.password, 12)
+                    let user = new User({
+                        username: uname,
+                        email: args.email,
+                        password: passHash,
+                        age: args.age
+                    })
+                    let res = await user.save()
+                    return res
+                }
             }
         }
     }
