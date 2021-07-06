@@ -1,6 +1,8 @@
 const graphql = require('graphql')
 const { UserType, AuthType } = require("./Types.js")
 const User = require("../models/User.js")
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 const { GraphQLID,
     GraphQLInt,
@@ -15,27 +17,36 @@ const Query = new GraphQLObjectType({
     name: "Query",
     fields: {
         login: {
-            type: UserType,
+            type: AuthType,
             args: {
                 email: { type: new GraphQLNonNull(GraphQLString) },
                 password: { type: new GraphQLNonNull(GraphQLString) }
             },
             async resolve(parents, args) {
                 let query = await User.findOne({ email: args.email })
-                if (query) {
-                    throw new Error('User already exists.')
+                if (!query) {
+                    throw new Error('User does not exist.')
                 }
                 else {
-                    let uname = args.email.split('@')[0]
-                    let passHash = await bcrypt.hash(args.password, 12)
-                    let user = new User({
-                        username: uname,
-                        email: args.email,
-                        password: passHash,
-                        age: args.age
-                    })
-                    let res = await user.save()
-                    return res
+                    let isEqual = await bcrypt.compare(args.password, query.password)
+                    if (!isEqual) {
+                        throw new Error('Password is incorrect.')
+                    }
+                    else {
+                        const accessToken = await jwt.sign({ id: query._id, email: query.email }, 'accessToken', {
+                            expiresIn: '60s'
+                        })
+                        const refreshToken = await jwt.sign({ id: query._id, email: query.email }, 'refreshToken', {
+                            expiresIn: '7d'
+                        })
+                        return {
+                            id: query._id,
+                            accessToken: accessToken,
+                            refreshToken: refreshToken,
+                            accesstokenExp: '60s',
+                            refreshtokenExp: '7d',
+                        }
+                    }
                 }
             }
         }

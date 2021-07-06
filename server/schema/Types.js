@@ -23,10 +23,11 @@ const UserType = new GraphQLObjectType({
 const AuthType = new GraphQLObjectType({
     name: "Auth",
     fields: () => ({
-        userID: { type: GraphQLID },
+        id: { type: GraphQLID },
         accessToken: { type: GraphQLString },
         refreshToken: { type: GraphQLString },
-        tokenExp: { type: GraphQLInt }
+        accesstokenExp: { type: GraphQLString },
+        refreshtokenExp: { type: GraphQLString }
     })
 })
 
