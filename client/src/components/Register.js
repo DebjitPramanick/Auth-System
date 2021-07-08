@@ -1,6 +1,10 @@
 import React, {useState} from 'react'
+import { useMutation } from '@apollo/client';
+import { REGISTER_USER } from '../queries/Queries';
 
 const Register = () => {
+
+    const {createUser} = useMutation(REGISTER_USER)
 
     const [data, setdata] = useState({
         email: '',
@@ -10,7 +14,7 @@ const Register = () => {
 
     const register = (e) => {
         e.preventDefault()
-
+        createUser()
     }
 
     return (
