@@ -33,8 +33,9 @@ const Query = new GraphQLObjectType({
                         throw new Error('Password is incorrect.')
                     }
                     else {
+                        console.log(query)
                         const accessToken = await jwt.sign({ id: query._id, email: query.email }, 'accessToken', {
-                            expiresIn: '60s'
+                            expiresIn: '20s'
                         })
                         const refreshToken = await jwt.sign({ id: query._id, email: query.email }, 'refreshToken', {
                             expiresIn: '7d'
@@ -43,7 +44,7 @@ const Query = new GraphQLObjectType({
                             id: query._id,
                             accessToken: accessToken,
                             refreshToken: refreshToken,
-                            accesstokenExp: '60s',
+                            accesstokenExp: '20s',
                             refreshtokenExp: '7d',
                         }
                     }

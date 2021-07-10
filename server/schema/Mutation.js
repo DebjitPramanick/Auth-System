@@ -2,6 +2,8 @@ const graphql = require('graphql')
 const { UserType, AuthType } = require("./Types.js")
 const bcrypt = require('bcryptjs')
 const User = require("../models/User.js")
+const verifyToken = require('../middleware/verifyToken.js')
+const jwt = require('jsonwebtoken')
 
 const { GraphQLID,
     GraphQLInt,
@@ -37,6 +39,35 @@ const Mutation = new GraphQLObjectType({
                     })
                     let res = await user.save()
                     return res
+                }
+            }
+        },
+        
+        generateToken: {
+            type: AuthType,
+            args: {
+                refreshToken: { type: new GraphQLNonNull(GraphQLString) },
+            },
+            async resolve(parent, args) {
+                if(!args.refreshToken){
+                    throw new Error("Not a refresh token.")
+                }
+                else{
+                    let userId = await verifyToken(args.refreshToken)
+                    let user = await User.findById(userId)
+                    const accessToken = await jwt.sign({ id: user._id, email: user.email }, 'accessToken', {
+                        expiresIn: '20s'
+                    })
+                    const refreshToken = await jwt.sign({ id: user._id, email: user.email }, 'refreshToken', {
+                        expiresIn: '7d'
+                    })
+                    return {
+                        id: user._id,
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                        accesstokenExp: '20s',
+                        refreshtokenExp: '7d',
+                    }
                 }
             }
         }
