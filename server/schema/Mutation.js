@@ -33,7 +33,7 @@ const Mutation = new GraphQLObjectType({
                     let passHash = await bcrypt.hash(args.password, 12)
 
                     const accessToken = await jwt.sign({ email: args.email }, 'accessToken', {
-                        expiresIn: '1h'
+                        expiresIn: '20s'
                     })
                     const refreshToken = await jwt.sign({ email: args.email }, 'refreshToken', {
                         expiresIn: '7d'
@@ -46,7 +46,7 @@ const Mutation = new GraphQLObjectType({
                         age: args.age,
                         accessToken: accessToken,
                         refreshToken: refreshToken,
-                        accessTokenExp: '1h',
+                        accessTokenExp: '20s',
                         refreshTokenExp: '7d',
                     })
                     let res = await user.save()

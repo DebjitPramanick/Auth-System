@@ -6,7 +6,7 @@ const Register = () => {
 
     const [createUser] = useMutation(REGISTER_USER)
 
-    const [data, setdata] = useState({
+    const [info, setInfo] = useState({
         email: '',
         age: '',
         password: ''
@@ -15,10 +15,23 @@ const Register = () => {
     const register = (e) => {
         e.preventDefault()
         createUser({variables: {
-            email: data.email,
-            password: data.password,
-            age: data.age
+            email: info.email,
+            password: info.password,
+            age: info.age
         }})
+        .then(res => {
+            let user = {
+                email: res.data.createUser.email,
+                username: res.data.createUser.username,
+                age: res.data.createUser.age,
+                accessToken: res.data.createUser.accessToken,
+                refreshToken: res.data.createUser.refreshToken
+            }
+            localStorage.setItem('user', JSON.stringify(user))
+        })
+        .catch(err => {
+            alert(err)
+        })
     }
 
     return (
@@ -26,15 +39,15 @@ const Register = () => {
             <form className="form-box" onSubmit={register}>
                 <h3>Register</h3>
                 <input placeholder="Email"
-                value={data.email}
-                onChange={(e) => setdata({...data, email: e.target.value})}></input>
+                value={info.email}
+                onChange={(e) => setInfo({...info, email: e.target.value})}></input>
                 <input type="number" placeholder="Age"
-                value={data.age}
-                onChange={(e) => setdata({...data, age: Number(e.target.value)})}></input>
+                value={info.age}
+                onChange={(e) => setInfo({...info, age: Number(e.target.value)})}></input>
                 <input placeholder="Password"
                 type="password"
-                value={data.password}
-                onChange={(e) => setdata({...data, password: e.target.value})}></input>
+                value={info.password}
+                onChange={(e) => setInfo({...info, password: e.target.value})}></input>
                 <button>Register</button>
             </form>
         </div>
