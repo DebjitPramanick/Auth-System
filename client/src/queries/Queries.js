@@ -9,3 +9,15 @@ mutation($email: String!, $age: Int, $password: String!){
     }
   }
 `
+
+export const LOGIN_USER = gql`
+query($email: String!, $password: String!){
+  login(email: $email, password: $password){
+    id
+    accessToken
+    refreshToken
+    accesstokenExp
+    refreshtokenExp
+  }
+}
+`

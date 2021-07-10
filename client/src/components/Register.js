@@ -4,7 +4,7 @@ import { REGISTER_USER } from '../queries/Queries';
 
 const Register = () => {
 
-    const {createUser} = useMutation(REGISTER_USER)
+    const [createUser] = useMutation(REGISTER_USER)
 
     const [data, setdata] = useState({
         email: '',
@@ -14,7 +14,11 @@ const Register = () => {
 
     const register = (e) => {
         e.preventDefault()
-        createUser()
+        createUser({variables: {
+            email: data.email,
+            password: data.password,
+            age: data.age
+        }})
     }
 
     return (
@@ -26,7 +30,7 @@ const Register = () => {
                 onChange={(e) => setdata({...data, email: e.target.value})}></input>
                 <input type="number" placeholder="Age"
                 value={data.age}
-                onChange={(e) => setdata({...data, age: e.target.value})}></input>
+                onChange={(e) => setdata({...data, age: Number(e.target.value)})}></input>
                 <input placeholder="Password"
                 type="password"
                 value={data.password}

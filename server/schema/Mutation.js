@@ -31,42 +31,57 @@ const Mutation = new GraphQLObjectType({
                 else {
                     let uname = args.email.split('@')[0]
                     let passHash = await bcrypt.hash(args.password, 12)
+
+                    const accessToken = await jwt.sign({ email: args.email }, 'accessToken', {
+                        expiresIn: '1h'
+                    })
+                    const refreshToken = await jwt.sign({ email: args.email }, 'refreshToken', {
+                        expiresIn: '7d'
+                    })
+
                     let user = new User({
                         username: uname,
                         email: args.email,
                         password: passHash,
-                        age: args.age
+                        age: args.age,
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                        accessTokenExp: '1h',
+                        refreshTokenExp: '7d',
                     })
                     let res = await user.save()
                     return res
                 }
             }
         },
-        
+
         generateToken: {
-            type: AuthType,
+            type: UserType,
             args: {
                 refreshToken: { type: new GraphQLNonNull(GraphQLString) },
             },
             async resolve(parent, args) {
-                if(!args.refreshToken){
+                if (!args.refreshToken) {
                     throw new Error("Not a refresh token.")
                 }
-                else{
-                    let userId = await verifyToken(args.refreshToken)
-                    let user = await User.findById(userId)
-                    const accessToken = await jwt.sign({ id: user._id, email: user.email }, 'accessToken', {
+                else {
+                    let userEmail = await verifyToken(args.refreshToken)
+                    let user = await User.findOne({ email: userEmail })
+                    const accessToken = await jwt.sign({ email: user.email }, 'accessToken', {
                         expiresIn: '20s'
                     })
-                    const refreshToken = await jwt.sign({ id: user._id, email: user.email }, 'refreshToken', {
+                    const refreshToken = await jwt.sign({ email: user.email }, 'refreshToken', {
                         expiresIn: '7d'
                     })
                     return {
-                        id: user._id,
+                        username: user.username,
+                        email: user.email,
+                        age: user.age,
+                        userID: user._id,
                         accessToken: accessToken,
                         refreshToken: refreshToken,
-                        accesstokenExp: '20s',
-                        refreshtokenExp: '7d',
+                        accessTokenExp: user.accessTokenExp,
+                        refreshTokenExp: user.refreshTokenExp
                     }
                 }
             }

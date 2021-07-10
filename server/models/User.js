@@ -6,7 +6,11 @@ const UserSchema = new Schema({
     username: String,
     email: String,
     password: String, 
-    age: Number
+    age: Number,
+    accessToken: String,
+    refreshToken: String,
+    accessTokenExp: String,
+    refreshTokenExp: String
 })
 
 module.exports = new mongoose.model('User', UserSchema)

@@ -17,7 +17,7 @@ const Query = new GraphQLObjectType({
     name: "Query",
     fields: {
         login: {
-            type: AuthType,
+            type: UserType,
             args: {
                 email: { type: new GraphQLNonNull(GraphQLString) },
                 password: { type: new GraphQLNonNull(GraphQLString) }
@@ -33,19 +33,21 @@ const Query = new GraphQLObjectType({
                         throw new Error('Password is incorrect.')
                     }
                     else {
-                        console.log(query)
-                        const accessToken = await jwt.sign({ id: query._id, email: query.email }, 'accessToken', {
+                        const accessToken = await jwt.sign({ email: query.email }, 'accessToken', {
                             expiresIn: '20s'
                         })
-                        const refreshToken = await jwt.sign({ id: query._id, email: query.email }, 'refreshToken', {
+                        const refreshToken = await jwt.sign({ email: query.email }, 'refreshToken', {
                             expiresIn: '7d'
                         })
                         return {
-                            id: query._id,
-                            accessToken: accessToken,
+                            username: query.username,
+                            email: query.email,
+                            age: query.age,
+                            userID: query._id, 
+                            accessToken: accessToken, 
                             refreshToken: refreshToken,
-                            accesstokenExp: '20s',
-                            refreshtokenExp: '7d',
+                            accessTokenExp: query.accessTokenExp,
+                            refreshTokenExp: query.refreshTokenExp
                         }
                     }
                 }

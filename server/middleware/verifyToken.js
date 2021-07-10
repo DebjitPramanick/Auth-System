@@ -9,6 +9,6 @@ module.exports = (token) => {
         throw new Error("Unauthorized!")
     }
 
-    let id = decodeToken.id
-    return id
+    let email = decodeToken.email
+    return email
 }
